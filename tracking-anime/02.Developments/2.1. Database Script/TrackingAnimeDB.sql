@@ -1,66 +1,115 @@
-create database TrackingAnimeDB
+CREATE DATABASE TrackingAnimeDB
+GO
 
-create table Account(
-	AccountID varchar(8) primary key,
-	Username varchar(50) not null,
-	Password varchar(50) not null,
-	Email varchar(100) not null,
-	IsAdmin bit default 0,
-	Nickname varchar(50) not null,
+Use TrackingAnimeDB
+
+-- 1. Account table
+CREATE TABLE Account(
+	account_id INT IDENTITY(1,1),
+	username VARCHAR(50) UNIQUE NOT NULL,
+	password VARCHAR(32) NOT NULL,
+	email VARCHAR(255) UNIQUE NOT NULL,
+	nickname NVARCHAR(50) UNIQUE NOT NULL,
+	PRIMARY KEY (account_id)
 )
 
-create table ManageAccount(
-	AdminID varchar(8) foreign key(AdminID) references Account(AccountID),
-	UserID varchar(8) foreign key(UserID) references Account(AccountID),
-	ID varchar(8) primary key (AdminID, UserID)
+-- 2. Genre table
+CREATE TABLE Genre (
+	genre_id INT IDENTITY(1,1),
+	name VARCHAR(50) NOT NULL UNIQUE,
+	description TEXT,
+	PRIMARY KEY (genre_id)
+);
+
+-- 3. Anime table
+CREATE TABLE Anime(
+	anime_id INT IDENTITY(1,1),
+	account_id INT NOT NULL,
+	title VARCHAR(50) NOT NULL,
+	poster VARCHAR(100), /* link poster*/
+	status TINYINT, /* 1 - Airing, 2 - Finished, 3 - Cancelled, 4 - Upcoming*/
+	aried DATETIME, /* Release time */
+	episodes INT, 
+	new_eposode INT, /* new episode */
+	studio NVARCHAR(20),
+	type TINYINT, /* 1 - Series, 2 - Movies, 3 - OVA */
+	introduction NVARCHAR(200), /* Description */
+	season TINYINT, /* 1 - Spring, 2 - Summer, 3 - Autumn, 4 - Winter*/
+	nation TINYINT DEFAULT 1, /* 1 - Japan, 2 - China, 3 - Others*/
+	score FLOAT DEFAULT 0,
+	rankded INT DEFAULT -1,
+	
+	
+	PRIMARY KEY (anime_id),
+	FOREIGN KEY(account_id) REFERENCES Account(account_id),
 )
 
-create table Anime(
-	AnimeID varchar(8) primary key,
-	AccountID varchar(8) foreign key(AccountID) references Account(AccountID),
-	Title varchar(50) not null,
-	Type tinyint,
-	Genre tinyint,
-	Poster varchar(100),
-	Status tinyint,
-	Studio nvarchar(20),
-	Synopsis nvarchar(200),
-	Broadcast datetime,
-	Aried date,
-	Season varchar(10),
-	Episode int not null,
-	Nation tinyint,
-	Score float not null,
-	Rankded int
+-- 4. Schedule table
+CREATE TABLE Schedule (
+	schedule_id INT IDENTITY(1,1),
+	anime_id INT NOT NULL,
+	day TINYINT NOT NULL, /* 2 - Monday, 3 - Tueday, ... , 8 - Sunday*/
+	time TIME,
+
+	PRIMARY KEY (schedule_id),
+	FOREIGN KEY (anime_id) REFERENCES Anime(anime_id)
+);
+
+-- 5. Genre with Anime table
+CREATE TABLE GenreWithAnime(
+	anime_id INT NOT NULL,
+	genre_id INT NOT NULL,
+
+	FOREIGN KEY (anime_id) REFERENCES Anime(anime_id),
+	FOREIGN KEY (genre_id) REFERENCES Genre(genre_id),
+	CONSTRAINT PK_ID PRIMARY KEY (anime_id, genre_id)
 )
 
-create table TrackingList(
-	TLID varchar(8) primary key,
-	AccountID varchar(8) foreign key(AccountID) references Account(AccountID),
-	CreatedDay Date,
-	NumberOfAnime int,
-	Mode bit
+-- 6. Tracking List table
+CREATE TABLE TrackingList(
+	tl_id INT IDENTITY(1,1),
+	account_id INT NOT NULL,
+	created_day DATE NOT NULL,
+	number_of_anime INT DEFAULT 0,
+	mode BIT DEFAULT 1, /* 0 - Once a day, 1 - time of tracking anime */
+	last_updated DATETIME,
+
+	PRIMARY KEY (tl_id),
+	FOREIGN KEY(account_id) REFERENCES Account(account_id)
 )
 
-create table TrackingAnime(
-	TAID varchar(8) primary key,
-	TLID varchar(8) foreign key(TLID) references TrackingList(TLID),
-	AnimeID varchar(8) foreign key(AnimeID) references Anime(AnimeID),
-	WatchingStatus tinyint,
-	LastWatchedEpisode int,
-	IsFavorite bit
+-- 7. Tracking Anime
+CREATE table TrackingAnime(
+	tl_id INT NOT NULL,
+	anime_id INT NOT NULL,
+	status TINYINT NOT NULL,
+	/*
+		1. Plan to Watch
+		2. Watching
+		3. Completed
+		4. On Hold
+		5. Dropped
+	*/
+	last_watched_episode INT,
+	isFavorite BIT DEFAULT 0,
+
+	FOREIGN KEY(tl_id) REFERENCES TrackingList(tl_id),
+	FOREIGN KEY(anime_id) REFERENCES Anime(anime_id),
+	CONSTRAINT PK_TL_ID PRIMARY KEY (tl_id, anime_id)
 )
 
-create table Feedback(
-	FBID varchar(8) primary key,
-	AccountID varchar(8) foreign key(AccountID) references Account(AccountID),
-	AnimeID varchar(8) foreign key(AnimeID) references Anime(AnimeID),
-	Subject varchar(50) not null,
-	Content nvarchar(200) not null,
-	Email varchar(100),
-	Score int,
-	Date Date
+-- 8. Notification
+CREATE TABLE Notification(
+	id INT IDENTITY(1,1),
+	ref_tl_id INT NOT NULL,
+	ref_anime_id INT NOT NULL,
+	ta_id INT NOT NULL,
+	time DATETIME NOT NULL,
+	isChecked BIT DEFAULT 0, /* 1 - Notification checked, 0 - not checked */
+
+	PRIMARY KEY (id),
+	FOREIGN KEY (ref_tl_id, ref_anime_id) REFERENCES TrackingAnime(tl_id, anime_id)
 )
 
-drop table Feedback
-
+drop table Notification
+--DROP DATABASE TrackingAnimeDB 
