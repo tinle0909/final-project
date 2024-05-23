@@ -10,6 +10,7 @@ CREATE TABLE Account(
 	password VARCHAR(32) NOT NULL,
 	email VARCHAR(255) UNIQUE NOT NULL,
 	nickname NVARCHAR(50) UNIQUE NOT NULL,
+	last_open DATETIME NOT NULL,
 	PRIMARY KEY (account_id)
 )
 
@@ -30,7 +31,7 @@ CREATE TABLE Anime(
 	status TINYINT, /* 1 - Airing, 2 - Finished, 3 - Cancelled, 4 - Upcoming*/
 	aried DATETIME, /* Release time */
 	episodes INT, 
-	new_eposode INT, /* new episode */
+	new_episode INT, /* new episode */
 	studio NVARCHAR(20),
 	type TINYINT, /* 1 - Series, 2 - Movies, 3 - OVA */
 	introduction NVARCHAR(200), /* Description */
@@ -103,13 +104,11 @@ CREATE TABLE Notification(
 	id INT IDENTITY(1,1),
 	ref_tl_id INT NOT NULL,
 	ref_anime_id INT NOT NULL,
-	ta_id INT NOT NULL,
 	time DATETIME NOT NULL,
 	isChecked BIT DEFAULT 0, /* 1 - Notification checked, 0 - not checked */
 
 	PRIMARY KEY (id),
-	FOREIGN KEY (ref_tl_id, ref_anime_id) REFERENCES TrackingAnime(tl_id, anime_id)
+	FOREIGN KEY (ref_tl_id, ref_anime_id) REFERENCES TrackingAnime(tl_id, anime_id),
 )
 
-drop table Notification
 --DROP DATABASE TrackingAnimeDB 

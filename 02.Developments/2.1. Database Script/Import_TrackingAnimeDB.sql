@@ -1,8 +1,8 @@
 /* Import Data to Tracking Anime Database*/
 USE TrackingAnimeDB
 -- 1. Insert statements (1 user) for Account table
-INSERT INTO Account (username, password, email, nickname)
-VALUES ('user1', '123456', 'user1@gmail.com',N'Hinata');
+INSERT INTO Account (username, password, email, nickname, last_open)
+VALUES ('user1', '123456', 'user1@gmail.com',N'Hinata', '2024-5-21 16:00:00');
 
 --select * from Account
 
@@ -21,7 +21,7 @@ VALUES
   ('Slice of Life', 'Slice of Life anime depict everyday experiences and situations in a realistic or lighthearted way.');
 
   -- 3. Insert statements (7 Anime) for Anime table
- INSERT INTO Anime (account_id, title, poster, status, aried, episodes, new_eposode, studio, type, introduction, season, nation)
+ INSERT INTO Anime (account_id, title, poster, status, aried, episodes, new_episode, studio, type, introduction, season, nation)
 VALUES 
 		(1, 'One Piece', 'https://cdn.myanimelist.net/images/anime/1244/138851.jpg', 1, '1999-07-20', NULL, 1102, 'Toei Animation', 1, 'Monkey D. Luffy recruits crewmates to find the legendary One Piece...', NULL, 1),
 		(1, 'Solo Leveling', 'https://cdn.myanimelist.net/images/anime/1926/140799.jpg', 2, '2024-07-01', 12, 12, 'D&C Media', 1, 'A low-ranked hunter gets a chance to change his fate...', 4, 1),
@@ -32,33 +32,34 @@ VALUES
 		(1, 'Oshi no Ko (Season 2)', 'https://cdn.myanimelist.net/images/anime/NONE/142710.jpg', 4, NULL, NULL, 0, 'Doga Kobo', 1, 'Second season of "Oshi no Ko".', 3, 1)
 
 
-SELECT * FROM Anime
+--SELECT * FROM Anime
 
 -- 4. Insert statements for Schedule
 INSERT INTO Schedule(anime_id, day, time)
 VALUES
-	(4, 8, '12:00:00'),
-	(4, 5, '18:45:00'),
-	(6, 8, '19:00:00'),
-	(9, 7, '23:30:00')
+	(1, 7, '12:00:00'),
+	(1, 4, '18:45:00'),
+	(3, 7, '07:00:00'),           
+	(6, 3, '23:30:00')
 
-select * from Schedule
+--select * from Schedule
+delete from Schedule
 
-I-- 5. Insert statement for GenreWithAnime
+-- 5. Insert statement for GenreWithAnime
 INSERT INTO GenreWithAnime(anime_id, genre_id)
 VALUES
-	(4, 1),
-	(4, 2),
-	(5, 1),
-	(5, 5),
+	(1, 1),
+	(1, 2),
+	(2, 1),
+	(2, 5),
+	(3, 1),
+	(3, 5),
+	(4, 5),
+	(4, 7),
+	(5, 8),
 	(6, 1),
-	(6, 5),
-	(7, 5),
-	(7, 7),
-	(8, 8),
-	(9, 1),
-	(9, 10),
-	(10, 4)
+	(6, 10),
+	(7, 4)
 
 --select * from GenreWithAnime
 
@@ -67,11 +68,19 @@ INSERT INTO TrackingList(account_id , created_day, number_of_anime, mode, last_u
 VALUES
 	(1, '2024-5-1', 3, 2, '2024-5-6')
 
-SELECT * FROM TrackingList
+--SELECT * FROM TrackingList
 
 -- 7. Insert statements for TrackingAnime Table 
 INSERT INTO TrackingAnime(tl_id, anime_id, status, last_watched_episode, isFavorite)
 VALUES
-	(1, 4, 2, 1102, 1),
-	(1, 7, 3, 500, 0),
-	(1, 10, 1, NULL, 1)
+	(1, 1, 2, 1102, 1),
+	(1, 4, 3, 500, 0),
+	(1, 7, 1, NULL, 1)
+
+--select * from TrackingAnime
+
+-- 8. Insert statements for Notification table
+INSERT INTO Notification(ref_tl_id, ref_anime_id, time, isChecked)
+VALUES
+	(1, 4, '2024-5-2 18:45:00', 1),
+	(1, 4, '2024-5-5 12:00:00', 0)
